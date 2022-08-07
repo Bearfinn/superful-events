@@ -1,6 +1,6 @@
 import axios from "axios";
 import { auth, Client } from "twitter-api-sdk";
-import { SuperfulEvent } from "types/Event";
+import { SuperfulEvent, SuperfulEventOverview } from "types/Event";
 
 let newEvents: SuperfulEvent[] = [];
 
@@ -24,15 +24,28 @@ export const getAccessToken = async (authCode: string) => {
   await authClient.requestAccessToken(authCode);
 }
 
-export const tweetNewEvent = async (event: SuperfulEvent) => {
-  if (authClient.token) {
-    await client.tweets.createTweet({
-      text: `🎉 New raffle is active! 🎉
-  ${event.name} by ${event.project.name}
-  
-      https://www.superful.xyz/project/${event.project.slug}/${event.type}/${event.slug}`
-    })
+export const tweetNewEvent = async (eventShort: SuperfulEvent) => {
+  if (!authClient.token) {
+    console.error("Not authenticated yet. Tweet not sent.");
+    return;
   }
+
+  const response = await axios.get(`https://www.superful.xyz/superful-api/v1/project/${eventShort.project.slug}?event_slug=${eventShort.slug}`)
+  const eventOverview: SuperfulEventOverview = response.data;
+  console.log(eventOverview)
+  const event = eventOverview.events[0];
+  const project = eventOverview.project;
+  const requireDiscord = event.discord_requirements.required;
+  const requireTwitter = event.twitter_requirements;
+  await client.tweets.createTweet({
+    text: `🎉 New raffle is active! 🎉
+${event.name} ❤️ by ${project.name} @${project.twitter_username}
+
+${requireDiscord ? "👾 Join Project Discord" : "✅ No Discord required"}
+${requireTwitter.length > 0 ? `🕊 Follow ${requireTwitter.map((account) => `@${account}`).join(", ")}` : "✅ No Twitter required"}
+
+    https://www.superful.xyz/project/${project.slug}/${event.type}/${event.slug}`
+  })
 }
 
 export const checkEvents = async () => {
