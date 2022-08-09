@@ -15,7 +15,7 @@ const ConfigSchema = Type.Strict(
     NODE_ENV: Type.Enum(NodeEnv),
     LOG_LEVEL: Type.String(),
     HOST: Type.String(),
-    PORT: Type.String(),
+    PORT: Type.Number({ default: 3001 }),
   })
 );
 
