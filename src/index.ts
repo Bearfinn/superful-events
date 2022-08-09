@@ -33,8 +33,8 @@ if (process.env.NODE_ENV !== 'test') {
     console.error(err);
     process.exit(1);
   });
-  const port = +server.config.HOST;
-  const host = server.config.PORT;
+  const port = +server.config.PORT;
+  const host = server.config.HOST;
   await server.listen({ host, port });
 
   for (const signal of ['SIGINT', 'SIGTERM']) {
