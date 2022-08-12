@@ -19,7 +19,7 @@ ${authUrl}`);
 
 export const client = new Client(authClient)
 
-export const getAccessToken = async (authCode: string) => {
+export const requestAccessToken = async (authCode: string) => {
   console.log(`My auth code: ${authCode}`)
   await authClient.requestAccessToken(authCode);
 }
