@@ -1,0 +1,29 @@
+envs:
+- key: TWITTER_CLIENT_ID
+  scope: RUN_AND_BUILD_TIME
+  type: SECRET
+  value: EV[1:GmaHqxIPBK2/sigb6xiQb+fNNLDzB3op:ZIwoMdxhcr9ddJf71vSRC3JQ9cBhZl6jeneIYAuhtV8BgsSPptG3jlTeIq3frQpAsjI=]
+- key: TWITTER_CLIENT_SECRET
+  scope: RUN_AND_BUILD_TIME
+  type: SECRET
+  value: EV[1:AeO9cLlNycidXThje5bguvWEvL3MhWKn:ZHxIQ4040HiQx7pops0LWFqVqBXbSQr3Pb60T5lZEMlKzJZjmR3IP3ZdWBV4MnUVtFecc+03/evGsBLs/uQADlJr]
+- key: TWITTER_OAUTH_CALLBACK_URL
+  scope: RUN_AND_BUILD_TIME
+  value: https://127.0.0.1:8080
+name: superful-events
+region: sgp
+services:
+- build_command: pnpm build
+  environment_slug: node-js
+  github:
+    branch: main
+    deploy_on_push: true
+    repo: Bearfinn/superful-events
+  http_port: 8080
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  name: superful-events
+  routes:
+  - path: /superful-events2
+  run_command: pnpm start
+  source_dir: /

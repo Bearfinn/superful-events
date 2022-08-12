@@ -62,6 +62,7 @@ export const checkEvents = async () => {
 export const run = async () => {
   const response = await axios.post<{ results: SuperfulEvent[] }>("https://www.superful.xyz/superful-api/v1/project/events", { page: 1 })
   newEvents = response.data.results;
+  checkEvents();
   setInterval(() => {
     checkEvents();
   }, 5 * 60 * 1000)
