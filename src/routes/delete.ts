@@ -1,16 +1,16 @@
 import { Type } from '@sinclair/typebox';
 import { NowRequestHandler } from 'fastify-now';
 import { sleepSecs } from 'twitter-api-v2/dist/v1/media-helpers.v1.js';
-import { client } from '../events.js';
+import { twitterClient } from '../utils/auth.js';
 
 export const GET: NowRequestHandler = async function () {
   try {
-    const tweets = await client.tweets.usersIdTweets("1555753370224570369", {
+    const tweets = await twitterClient.tweets.usersIdTweets("1555753370224570369", {
       max_results: 100,
     })
     let i = 0;
     for (const tweet of tweets.data || []) {
-      client.tweets.deleteTweetById(tweet.id)
+      twitterClient.tweets.deleteTweetById(tweet.id)
       await sleepSecs(1);
       console.log(`deleted ${++i} tweets`);
     }

@@ -3,7 +3,7 @@ import { URL } from "node:url";
 import fastify from 'fastify';
 import config from './plugins/config.js';
 import now from 'fastify-now';
-import { run } from "./events.js";
+import { monitorEvents } from "./utils/events.js";
 
 const server = fastify({
   ajv: {
@@ -24,7 +24,7 @@ await server.register(now, {
 });
 await server.ready();
 
-run();
+monitorEvents();
 
 export default server;
 

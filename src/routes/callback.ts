@@ -1,11 +1,24 @@
-import axios from "axios";
-import { tweetNewEvent } from "../events.js";
-import { NowRequestHandler } from "fastify-now";
-import { SuperfulEvent } from "types/Event";
+import { Type } from '@sinclair/typebox';
+import { NowRequestHandler } from 'fastify-now';
+import { requestAccessToken } from '../utils/auth.js';
 
 export const GET: NowRequestHandler = async function (request) {
-  const response = await axios.post<{ results: SuperfulEvent[] }>("https://www.superful.xyz/superful-api/v1/project/events", { page: 1 })
-  const newEvents = response.data.results;
-  tweetNewEvent(newEvents[0]);
-  return { hello: 'world' };
+  const query = request.query as { code: string };
+  try {
+    await requestAccessToken(query.code);
+    return { message: 'Authenticated' };
+  } catch (error) {
+    console.error(error)
+    return { message: error };
+  }
+};
+
+GET.opts = {
+  schema: {
+    response: {
+      200: Type.Object({
+        message: Type.String(),
+      }),
+    },
+  },
 };

@@ -1,0 +1,1 @@
+export const message = (message: string) => message.replace(/^ +/gm, '')
