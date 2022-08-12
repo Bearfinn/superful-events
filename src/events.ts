@@ -77,7 +77,6 @@ export const run = async () => {
     { page: 1 },
   );
   newEvents = response.data.results;
-  checkEvents();
   setInterval(() => {
     checkEvents();
   }, 5 * 60 * 1000);
