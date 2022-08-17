@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { SuperfulEvent, SuperfulEventOverview } from 'types/Event';
-import { twitterClient, isAuthenticated } from './auth.js';
+import { twitterClient, isAuthenticated, authClient } from './auth.js';
 import { message } from './formatting.js';
 
 let newEvents: SuperfulEvent[] = [];
@@ -27,6 +27,7 @@ export const getServerIdFromInviteCode = async (inviteCode?: string) => {
 };
 
 export const handleNewEvent = async (eventShort: SuperfulEvent) => {
+  console.log("Event detected: ", eventShort.name)
   if (!isAuthenticated) {
     console.error('Not authenticated yet. Tweet not sent.');
     return;
@@ -47,25 +48,32 @@ export const handleNewEvent = async (eventShort: SuperfulEvent) => {
   // const isProjectOwnDiscord = !!(eventServerId && projectServerId && eventServerId === projectServerId);
 
   if (!requireDiscord) {
-    await twitterClient.tweets.createTweet({
-      text: message(`
-        🎉 New raffle is active! 🎉
-        ${event.name} by ${project.name} @${project.twitter_username}
-  
-        ${
-          requireDiscord
-            ? `👾 Join Project Discord https://discord.gg/${event.discord_requirements.requirements[0].server_invite_code}`
-            : '✅ No Discord required'
-        }
-        ${
-          requireTwitter.length > 0
-            ? `🕊 Follow ${requireTwitter.map((account) => `@${account}`).join(', ')}`
-            : '✅ No Twitter required'
-        }
-  
-        https://www.superful.xyz/project/${project.slug}/${event.type}/${event.slug}
-      `),
-    });
+    try {
+      if (authClient.isAccessTokenExpired()) {
+        await authClient.refreshAccessToken()
+      }
+      await twitterClient.tweets.createTweet({
+        text: message(`
+          🎉 New raffle is active! 🎉
+          ${event.name} by ${project.name} @${project.twitter_username}
+    
+          ${
+            requireDiscord
+              ? `👾 Join Project Discord https://discord.gg/${event.discord_requirements.requirements[0].server_invite_code}`
+              : '✅ No Discord required'
+          }
+          ${
+            requireTwitter.length > 0
+              ? `🕊 Follow ${requireTwitter.map((account) => `@${account}`).join(', ')}`
+              : '✅ No Twitter required'
+          }
+    
+          https://www.superful.xyz/project/${project.slug}/${event.type}/${event.slug}
+        `),
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 };
 
