@@ -4,6 +4,7 @@ import fastify from 'fastify';
 import config from './plugins/config.js';
 import now from 'fastify-now';
 import { monitorEvents } from "./utils/events.js";
+import "./utils/discord.js"
 
 const server = fastify({
   ajv: {
