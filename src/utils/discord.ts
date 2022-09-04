@@ -1,6 +1,6 @@
 // Require the necessary discord.js classes
 import { Client, GatewayIntentBits, TextChannel } from 'discord.js'
-const token = "MTAwNDk1NTMzODE4Mjc3MDc3OQ.G3ouLF.wCQknQvR1gmwsN5aZHblv1WrP7Ss2L8gBI98vA"
+const token = process.env.DISCORD_TOKEN;
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
