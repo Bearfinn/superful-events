@@ -4,7 +4,7 @@ import { SuperfulEvent, SuperfulEventOverview } from 'types/Event';
 import { twitterClient, isAuthenticated, authClient } from './auth.js';
 import { message } from './formatting.js';
 
-let newEvents: SuperfulEvent[] = [];
+export let monitoredEvents: SuperfulEvent[] = [];
 
 export const getEventOverview = async (eventShort: SuperfulEvent) => {
   const response = await axios.get(
@@ -83,12 +83,12 @@ export const checkEvents = async () => {
     { page: 1 },
   );
 
-  for (const event of response.data.results) {
-    if (newEvents.find((newEvent) => newEvent.id === event.id)) continue;
-    handleNewEvent(event);
+  for (const newEvent of response.data.results) {
+    if (monitoredEvents.find((event) => event.id === newEvent.id)) continue;
+    handleNewEvent(newEvent);
   }
-  newEvents = response.data.results;
-  console.log(`Current events: ${response.data.results.length}, New events: ${newEvents.length}`);
+
+  monitoredEvents = response.data.results;
 };
 
 export const monitorEvents = async () => {
@@ -97,7 +97,7 @@ export const monitorEvents = async () => {
     'https://www.superful.xyz/superful-api/v1/project/events',
     { page: 1 },
   );
-  newEvents = response.data.results;
+  monitoredEvents = response.data.results;
   console.log(`Found ${response.data.results.length} active events.`);
 
   await checkEvents();
