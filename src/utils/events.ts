@@ -8,7 +8,7 @@ export let monitoredEvents: SuperfulEvent[] = [];
 
 export const getEventOverview = async (eventShort: SuperfulEvent) => {
   const response = await axios.get(
-    `https://www.superful.xyz/superful-api/v1/project/${eventShort.project.slug}?event_slug=${eventShort.slug}`,
+    encodeURI(`https://www.superful.xyz/superful-api/v1/project/${eventShort.project.slug}?event_slug=${eventShort.slug}`),
   );
 
   const eventOverview: SuperfulEventOverview = response.data;
@@ -33,7 +33,15 @@ export const handleNewEvent = async (eventShort: SuperfulEvent) => {
     return;
   }
 
-  const eventOverview = await getEventOverview(eventShort);
+  let eventOverview;
+  try {
+    eventOverview = await getEventOverview(eventShort);
+  } catch (error) {
+    console.error("Error getting event overview");
+    console.error(error);
+    return;
+  }
+
   const { events, project } = eventOverview;
   const event = events[0];
 
@@ -50,7 +58,8 @@ export const handleNewEvent = async (eventShort: SuperfulEvent) => {
   if (!requireDiscord) {
     try {
       if (authClient.isAccessTokenExpired()) {
-        await authClient.refreshAccessToken()
+        const token = await authClient.refreshAccessToken()
+        console.log("Token refreshed to ", token);
       }
       await twitterClient.tweets.createTweet({
         text: message(`
@@ -71,9 +80,13 @@ export const handleNewEvent = async (eventShort: SuperfulEvent) => {
           https://www.superful.xyz/project/${project.slug}/${event.type}/${event.slug}
         `),
       });
+      console.log("Tweet sent.")
     } catch (error) {
+      console.error("Error tweeting. Tweet not sent.")
       console.error(error);
     }
+  } else {
+    console.error("Requires Discord. Tweet not sent.")
   }
 };
 
